@@ -1,0 +1,155 @@
+NON-EXCLUSIVE RESEARCH USE LICENSE FOR 
+
+“A TARGETED APPROACH TO OPTIMIZED ULTRAVIOLET DISINFECTION OF SURFACES” (TAOUDS) SOFTWARE 
+
+ 
+
+The Software (as defined below) will only be licensed to You (as defined below) upon the condition that You accept all of the terms and conditions contained in this license agreement (“License”).  Please read this License carefully. By downloading and using the Software, You accept the terms and conditions of this License.    
+
+ 
+
+1.     Definitions. 
+
+    “Commercial Use” means sale, lease, license, distribution or otherwise making the Software available to a third party. 
+
+    “Derivative Work” means any derivative work, as defined by U.S. copyright law, of the Software, including any modification, enhancement, upgrade, or improvement to the Software. 
+
+     “License” means this document. 
+
+    “Software” means the TAOUDS software source code and object code.    
+
+The TAOUDS software provides a framework to optimally compute irradiation trajectories for Ultraviolet disinfection of environments given a robot model and an environment model. It is based on irradiation modelling, dosage optimization and path planning techniques. The software was disclosed to ILLINOIS under Technology No. 2020-153, “A Targeted Approach for Optimized Ultraviolet Disinfection of Surfaces”. ILLINOIS is the owner of the copyrights in Software as recognized under United States law and international treaties.  
+
+     “Research Use” means use of the Software for Your non-profit research, development, educational or personal and individual use, and expressly excludes Commercial Use. 
+
+    “You” (or “Your”) means an individual or legal entity exercising rights under, and complying with all of the terms of, this License.  For legal entities, “You” includes any entity that controls, is controlled by, or is under common control with You. For purposes of this License, “control” means ownership, directly or indirectly, of more than fifty percent (50%) of the equity capital of the legal entity. 
+
+ 
+
+    License Grant and Restrictions. 
+
+    Subject to Your compliance with the terms and conditions of this License, The Board of Trustees of the University of Illinois (“ILLINOIS”), hereby grants You a non-exclusive, non-transferable, restricted license to: 
+
+         Use the Software for Your Research Use; and 
+
+         Create Derivative Works of the Software for Your Research Use. 
+
+    You shall not make Commercial Use of the Software, Derivative Works of the Software without having executed an appropriate license with ILLINOIS.  Should You wish to make Commercial Use of the Software or Derivative Works of the Software, You shall contact ILLINOIS at otm@illinois.edu to determine whether a license for Commercial Use of the Software may be available. 
+
+    The Software is owned by ILLINOIS, and ILLINOIS retains its right, title, and interest in and to the Software. 
+
+    Nothing in this License shall be construed as conferring any license under any of ILLINOIS’ or any third party’s intellectual property rights, whether by estoppel, implication, or otherwise. 
+
+    You shall clearly mark and rename all Derivative Works of the Software to notify users that it is a modified version of the Software. 
+
+    You shall reproduce the following notice on all Derivative : 
+
+         “This software uses or is derived from TAOUDS developed at the University of Illinois at Urbana-Champaign.” 
+
+    For any reports or published results obtained using the Software, or Derivative Works of the Software, You shall acknowledge use of the Software by the following citation: 
+
+           TAOUDS, used by [insert Your name], was developed at the University of Illinois at Urbana-Champaign. 
+
+         You must supply one copy of each such report or publication to ILLINOIS by emailing Prof. Kris Hauser at kkhauser@illinois.edu.  
+
+ 
+
+    Confidential Information. 
+
+    You acknowledge that the Software is proprietary to ILLINOIS.  You agree to protect the Software from unauthorized disclosure, use, or release and to treat the Software with at least the same level of care as You use to protect Your own proprietary computer programs and/or confidential information, but in no event less than a reasonable standard of care.   
+
+    If You become aware of any unauthorized licensing, copying or use of the Software, You shall promptly notify ILLINOIS in writing at otm@illinois.edu. 
+
+    You agree to use the Software only in the manner and for the specific uses authorized in this License. 
+
+ 
+
+    Feedback/Contributions 
+
+    Because the Software is being distributed pursuant to the License for Research Use, ILLINOIS encourages licensees of the Software to provide feedback on the design of the Software.  ILLINOIS also encourages licensees of the Software to provide information regarding their experience with integrating the Software into their research.  Please submit such feedback to kkhauser@illinois.edu.  
+
+    ILLINOIS encourages contributions from users of the Software that might be used or incorporated by ILLINOIS, in its sole discretion, into future versions or revisions of the Software.  Licensees who contribute code agree that such code may be distributed by ILLINOIS under the terms of this License and may be required to sign an agreement with ILLINOIS before ILLINOIS can accept the code.  Please contact otm@illinois.edu for a copy of such agreement. 
+
+ 
+
+    Limitation of Warranties.   
+
+    Except as expressly set forth in this License, to the fullest extent allowed by applicable law, the Software is provided “AS IS,” and ILLINOIS DISCLAIMS ALL EXPRESS OR IMPLIED CONDITIONS, REPRESENTATIONS AND WARRANTIES, INCLUDING WITHOUT LIMITATION ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT. 
+
+    THIS LIMITATION OF WARRANTY IS AN ESSENTIAL PART OF THIS LICENSE.  NO USE OF THE SOFTWARE IS AUTHORIZED HEREUNDER EXCEPT UNDER THIS DISCLAIMER. 
+
+    ANY MATERIAL DOWNLOADED IS AT YOUR OWN DISCRETION AND RISK, AND YOU ARE SOLELY RESPONSIBLE FOR ANY DAMAGE TO YOUR COMPUTER SYSTEM OR LOSS OF DATA THAT RESULTS FROM THE DOWNLOAD OF SUCH MATERIAL, INCLUDING ANY DAMAGES RESULTING FROM COMPUTER VIRUSES. 
+
+ 
+
+    Indemnification.   
+
+You shall indemnify ILLINOIS (including its trustees, fellows, officers, employees, students, and agents) against any and all claims, losses, damages, and/or liability of whatsoever nature, as well as costs and expenses (including legal expenses and reasonable attorneys’ fees) arising out of or related to Your use, or inability to use, the Software or Derivative Works of the Software, regardless of theory of liability, whether for breach or in tort (including negligence). 
+
+ 
+
+    Limitation of Liability.   
+
+    You assume the entire risk as to the quality, results, performance, and/or non-performance of the Software and all Derivative Works of the Software.  Should the Software or Derivative Works of the Software prove defective in any manner, You assume the entire cost of any necessary, servicing, repair or correction. 
+
+    In no event shall ILLINOIS (including its trustees, fellows, officers, employees, students, and agents) be responsible or liable for any direct, indirect, special, incidental, punitive, consequential or other damages whatsoever (including lost profits, business, revenue, use, data, or other economic advantage) in connection with, or arising out of, or related to this License, regardless of the theory of liability, whether for breach or in tort (including negligence), even if ILLINOIS may have been previously advised of the possibility of such damage. 
+
+    Liability for damages shall be limited and excluded as set forth in this Section, even if any remedy provided for in this License fails of its essential purpose. 
+
+ 
+
+    Termination. 
+
+    This License is effective until terminated, as provided herein, or until all intellectual property rights in the Software expire. 
+
+    You may terminate this License at any time by destroying all copies of the Software and Derivative Works of the Software. 
+
+    This License, and the rights granted hereunder, will terminate automatically, and without any further notice from or action by ILLINOIS, if You fail to comply with any obligation of this License. 
+
+    Upon termination, You must immediately cease use of and destroy all copies of the Software and Derivative Works of the Software and verify such destruction in writing. 
+
+    The provisions set forth in Sections 3, 5, 6, 7, 9, and 10 shall survive termination or expiration of this License. 
+
+ 
+
+    Export Controls.  
+
+The Software delivered under this License and any Derivative Works of the Software may be subject to U.S. export control laws and may be subject to export or import regulations in other countries.  You agree to comply strictly with all such laws and regulations and acknowledge that You have the responsibility, at Your own expense, to obtain such licenses to export, re-export, or import as may be required. 
+
+ 
+
+    Miscellaneous. 
+
+    Governing Law.  This License shall be governed by the laws of the State of Illinois, U.S.A., without regard to any conflict of laws provisions. 
+
+    Severability.  If any provision of this License is held to be invalid or unenforceable by a court of competent jurisdiction, such invalidity or unenforceability shall not in any way affect the validity or enforceability of the remaining provisions. 
+
+    Assignment.  You may not assign or otherwise transfer any of Your rights or obligations under this License, without the prior written consent of ILLINOIS. 
+
+    Entire Agreement.  This License represents the parties’ entire agreement relating to the Software.  Except as otherwise provided herein, no modification of this Agreement is binding unless in writing and signed by an authorized representative of each party. 
+
+    Waiver.  The failure of either party to enforce any provision of this License shall not constitute a waiver of that right or future enforcement of that or any other provision. 
+
+ 
+
+Form approved by University Legal Counsel: EAR 05/2004 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
