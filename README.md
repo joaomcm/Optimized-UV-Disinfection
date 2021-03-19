@@ -6,7 +6,7 @@
 
 * Licensed under the “Non-exclusive Research Use License” (the "License");
 
-* The License is included in the distribution as License.txt file.
+* The License is included in the distribution as LICENSE.txt file.
 
 * See the License for the specific language governing permissions and imitations under the License.
 
