@@ -186,7 +186,7 @@ class Robot_3D_CSpace(CSpace):
         this_min = self.min_vals.copy()
         this_max = self.max_vals.copy()
 
-        for i in range(self.linear_dofs):
+        for i in self.linear_dofs:
             this_min[i] = milestone[i]-spatial_neighborhood
             # this_min[1] = milestone[1]-spatial_neighborhood
             this_max[i] = milestone[i]+spatial_neighborhood
