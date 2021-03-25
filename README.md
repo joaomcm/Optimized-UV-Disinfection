@@ -26,5 +26,5 @@ To get gurobi up and running on your system,you can follow the instructions here
 
 To install LKH-3.0.6 you can follow the instructions on the project's website: http://webhotel4.ruc.dk/~keld/research/LKH-3/
 
-## IMPORTANT: After installing LKH make sure to change lines 24-26 of the file tspSolver5.py to reflect the appropriate installation path
+## IMPORTANT: After installing LKH make sure to place it on the LKH-3.0.6 folder! 
 
