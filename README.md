@@ -28,3 +28,9 @@ To install LKH-3.0.6 you can follow the instructions on the project's website: h
 
 ## IMPORTANT: After installing LKH make sure to place it on the LKH-3.0.6 folder! 
 
+# Using our planner with different robots & environments
+
+To use the planner with a different environment, you should be able to simply change the "mesh_file" argument on either {robot}_experiments.
+Towerbot_experiments and floatbot_experiments give examples of how to adopt our pipeline to different robots. 
+
+For further inquiries, do not hesitate to contact us. We are happy to help.
