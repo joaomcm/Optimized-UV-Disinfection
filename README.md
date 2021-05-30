@@ -31,6 +31,6 @@ To install LKH-3.0.6 you can follow the instructions on the project's website: h
 # Using our planner with different robots & environments
 
 To use the planner with a different environment, you should be able to simply change the "mesh_file" argument on either {robot}_experiments.
-Towerbot_experiments and floatbot_experiments give examples of how to adopt our pipeline to different robots. 
+Towerbot_experiments.py and floatbot_experiments.py give examples of how to adopt our pipeline to different robots. The first deals with a somewhat similar robot that has no rotational joints and a light that is not a point light-source (thus showing how to adapt to more general light models) and the second deals with a robot that floats in 3D space, though showing what changes need to be made in case of larger differences between tested robots and the default robot - armbot.
 
 For further inquiries, do not hesitate to contact us. We are happy to help.
