@@ -14,7 +14,6 @@
 
 This is the public repository for the code of the paper "Optimized Coverage Planning for UV Surface Disinfection", ICRA 2021
 
-TODO: ADD Instructions on how to run the code
 
 # Getting this repository up and running:
 
@@ -27,6 +26,10 @@ To get gurobi up and running on your system,you can follow the instructions here
 To install LKH-3.0.6 you can follow the instructions on the project's website: http://webhotel4.ruc.dk/~keld/research/LKH-3/
 
 ## IMPORTANT: After installing LKH make sure to place it on the LKH-3.0.6 folder! 
+
+# Reproducing our Results
+
+In order to reproduce our results you should be able to just run {robot_model}_experiments.py. In order to visualize the results as a movie, the {Robot Model} Animations jupyter notebooks should create a series of still images that can be used to create a movie using ffmpeg or your program of choice. 
 
 # Using our planner with different robots & environments
 
