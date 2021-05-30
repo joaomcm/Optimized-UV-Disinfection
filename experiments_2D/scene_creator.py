@@ -18,7 +18,7 @@ import pickle
 import os
 from descartes.patch import PolygonPatch
 from matplotlib import pyplot as plt
-from figures import BLUE, SIZE, set_limits, plot_coords, color_isvalid
+from experiments_2D.figures import BLUE, SIZE, set_limits, plot_coords, color_isvalid
 from shapely.geometry import MultiPoint,Point
 from shapely.ops import split
 from tqdm import tqdm
@@ -29,9 +29,9 @@ import experiments_2D.visibilityGraph as vs
 # reload(gridLP)
 from experiments_2D.gridLP import get_grid_points, get_vs_graphs, solve_lp, get_grid_points_res
 
-import plotSolutions
+import experiments_2D.plotSolutions as plotSolutions
 # reload(plotSolutions)
-import plotSolutions as myplot
+import experiments_2D.plotSolutions as myplot
 
 from OpenGL.GL import *
 from OpenGL.GLU import *

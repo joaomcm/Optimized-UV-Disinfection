@@ -312,7 +312,7 @@ class Disinfection_Problem:
         
         mesh_path =  pathlib.PurePath(mesh_file)
 
-        mesh_name = mesh_path.name
+        mesh_name = mesh_path.name.split('.')[0]
         results_dir = results_dir+'/{}'.format(mesh_name)
         if(not os.path.exists(results_dir)):
             os.makedirs(results_dir,exist_ok = True)
