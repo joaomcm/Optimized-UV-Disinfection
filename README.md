@@ -17,10 +17,11 @@ Authors: Joao Correia Marques, Ramya Ramalingam, Zherong Pan, and Kris Hauser
 
 Contact: [Joao Correia Marques](mailto:jmc12@illinois.edu)
 
+Requires Python 3.x (3.7+ recommended) and an OpenGL 4.1-compatible graphics card for visibility calculations.
 
 # Installing Dependencies
 
-This program depends on two pieces of software distributed under separate liceses: Gurobi and LKH-3.0.6:
+This program depends on two pieces of software distributed under separate liceses: Gurobi and LKH-3.0.6.  To install:
 
 1. Install the Python libraries contained in requirements.txt (pip install -r requirements.txt)
 
