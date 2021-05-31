@@ -3,8 +3,8 @@ from tqdm import tqdm
 from klampt.model.collide import WorldCollider
 from klampt import WorldModel,Geometry3D
 
-from planning.disinfection_3D import Disinfection_Problem
-from planning.robot_cspaces import Robot_3D_CSpace,CSpaceObstacleSolver 
+from planning.disinfection3d import DisinfectionProblem
+from planning.robot_cspaces import Robot3DCSpace,CSpaceObstacleSolver 
 import pdb
 from klampt import vis
 import time
@@ -15,7 +15,7 @@ from copy import deepcopy
 from scipy.sparse import lil_matrix,csr_matrix
 
 
-class TowerbotDisinfectionProblem(Disinfection_Problem):
+class TowerbotDisinfectionProblem(DisinfectionProblem):
     def __init__(self,total_dofs,
     linear_dofs,
     angular_dofs,
@@ -229,7 +229,7 @@ problem = TowerbotDisinfectionProblem(
     lamp_linknum = 2,
     lamp_local_coords = [0,0,0],
     active_dofs = [0,1,3,6,7,8,9],
-    robot_cspace_generator = Robot_3D_CSpace,
+    robot_cspace_generator = Robot3DCSpace,
     robot_cspace_solver = CSpaceObstacleSolver,
     float_height = 0.08)
 

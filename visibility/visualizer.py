@@ -2,7 +2,7 @@ from klampt import WorldModel,Geometry3D
 from klampt.vis import GLProgram,camera,gldraw
 import klampt.math.vectorops as op
 from klampt.math import se3,so3
-import math,vapory
+import math
 
 TEXT_COLOR=(0,0,0)
 
@@ -177,9 +177,11 @@ class GLVisualizer(GLProgram):
         elif c=='p':
             if self.frameFunc is not None:
                 self.povray_properties.update(self.frameFunc(-1))
+            import povray
             povray.render_to_file(self.povray_properties,self.path+"/screenshot.png")
             povray.to_povray(self,self.world,self.povray_properties)
         elif c=='[':
+            import povray
             #remove existing
             import re,os
             for f in os.listdir(self.path):

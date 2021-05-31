@@ -1,10 +1,10 @@
 import pandas as pd
 from tqdm import tqdm
 
-from planning.disinfection_3D import Disinfection_Problem
-from planning.robot_cspaces import Robot_3D_CSpace,CSpaceObstacleSolver 
+from planning.disinfection3d import DisinfectionProblem
+from planning.robot_cspaces import Robot3DCSpace,CSpaceObstacleSolver 
 
-problem = Disinfection_Problem(
+problem = DisinfectionProblem(
     total_dofs = 11,
     linear_dofs = [0,1],
     angular_dofs = [4,5,6,7,8],
@@ -14,7 +14,7 @@ problem = Disinfection_Problem(
     lamp_linknum = 11,
     lamp_local_coords = [0,0,0],
     active_dofs = [0,1,4,5,6,7,8,9],
-    robot_cspace_generator = Robot_3D_CSpace,
+    robot_cspace_generator = Robot3DCSpace,
     robot_cspace_solver = CSpaceObstacleSolver,
     float_height = 0.08
 )

@@ -1,4 +1,4 @@
-from .robotOccluder import *
-from .shaderMesh import *
-from .shaderProgram import *
+from .robot_occluder import *
+from .shader_mesh import *
+from .shader_program import *
 from .visibility import *

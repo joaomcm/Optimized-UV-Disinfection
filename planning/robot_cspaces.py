@@ -11,57 +11,20 @@
 
 
 
-import os
-import sys
-import pickle
-import trimesh as tm
-import pyrender
 import numpy as np
-import time
-import random
-import math
-import klampt
 import networkx as nx
-import open3d as o3d
-import gurobipy as gp
 from tqdm import tqdm
-from copy import deepcopy
-import pandas as pd
 
-
-from klampt import IKObjective
-from klampt import WorldModel,Geometry3D
 from klampt import vis
-from klampt.math import so3,se3
-from klampt.model.create import moving_base_robot
-from klampt.io import resource
-from klampt.math import vectorops,so3
 from klampt.model.collide import WorldCollider
 from klampt.model import ik
 from klampt.plan.cspace import CSpace,MotionPlan
-from klampt.model.trajectory import RobotTrajectory,Trajectory
-from klampt.math.vectorops import interpolate
 from klampt.plan.cspace import CSpace,MotionPlan
-from klampt.vis.glprogram import GLProgram
 from klampt.plan import cspace,robotplanning
-
-
-from importlib import reload
-from visibility import Visibility
-from joblib import Parallel,delayed
-from tqdm import tqdm
-from scipy.sparse import lil_matrix
-
-from gurobipy import GRB
-from joblib import Parallel,delayed
 
 from sklearn.neighbors import KNeighborsClassifier
 
-from planning.getToursAndPaths import getTour, readTourFile, getPathFromPrm, getFinalPath
-import pdb
-
-
-class Robot_3D_CSpace(CSpace):
+class Robot3DCSpace(CSpace):
     def __init__(self,bounds,robot,collider,lamp,milestones,base_height_link = 2,robot_height = 1.5,float_height = 0.08,linear_dofs = [0,1],angular_dofs = [4,5,6,7,8],light_local_position  = [0,0,0]):
         CSpace.__init__(self)
         self.base_height_link = base_height_link

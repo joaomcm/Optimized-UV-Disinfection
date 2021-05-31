@@ -5,8 +5,8 @@ from klampt import WorldModel,Geometry3D
 from klampt.plan.cspace import CSpace,MotionPlan
 
 
-from planning.disinfection_3D import Disinfection_Problem
-from planning.robot_cspaces import Robot_3D_CSpace,CSpaceObstacleSolver 
+from planning.disinfection3d import DisinfectionProblem
+from planning.robot_cspaces import Robot3DCSpace,CSpaceObstacleSolver 
 
 import pdb
 from klampt import vis
@@ -15,7 +15,7 @@ import numpy as np
 import pickle
 
 
-class FloatbotDisinfectionProblem(Disinfection_Problem):
+class FloatbotDisinfectionProblem(DisinfectionProblem):
     def __init__(self,total_dofs,
     linear_dofs,
     angular_dofs,
@@ -138,7 +138,7 @@ class FloatbotDisinfectionProblem(Disinfection_Problem):
             return False
     
 
-class Floatbot_3D_CSpace(Robot_3D_CSpace):
+class Floatbot3DCSpace(Robot3DCSpace):
         def __init__(self,bounds,robot,collider,lamp,milestones,base_height_link = 2,robot_height = 1.5,float_height = 0.08,linear_dofs = [0,1],angular_dofs = [4,5,6,7,8],light_local_position  = [0,0,0]):
             CSpace.__init__(self)
 
@@ -198,7 +198,7 @@ problem = FloatbotDisinfectionProblem(
     lamp_linknum = 2,
     lamp_local_coords = [0,0,0],
     active_dofs = [0,1,2],
-    robot_cspace_generator = Floatbot_3D_CSpace,
+    robot_cspace_generator = Floatbot3DCSpace,
     robot_cspace_solver = CSpaceObstacleSolver,
     float_height = 0.08)
 
