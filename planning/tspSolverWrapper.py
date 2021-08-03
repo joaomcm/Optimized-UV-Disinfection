@@ -17,12 +17,12 @@ import math
 import numpy as np
 import time
 
-
+this_dir = os.path.dirname(__file__)
 
 # Change these directories based on where you have 
 # a compiled executable of the LKH TSP Solver !!!!!!!!!!!
-lkh_dir = '/home/motion/Optimized-UV-Disinfection/'
-tsplib_dir = '/home/motion/Optimized-UV-Disinfection/'
+lkh_dir = os.path.join(this_dir, '..') + '/'
+tsplib_dir = os.path.join(this_dir, '..') + '/'
 lkh_cmd = '/LKH-3.0.6/LKH'
 pwd= os.path.dirname(os.path.abspath(__file__))
 
@@ -51,7 +51,7 @@ def writeTSPLIBfile_FE(fname_tsp,CostMatrix,user_comment):
 		cost_matrix_strline = cost_matrix_strline + '\n'
 		Cost_Matrix_STRline.append(cost_matrix_strline)
 	
-	fileID = open((tsplib_dir + fname_tsp + '.tsp'), "w+")
+	fileID = open(tsplib_dir + fname_tsp + '.tsp', "w+")
 	# print(name_line)
 	fileID.write(name_line)
 	fileID.write(comment_line)
