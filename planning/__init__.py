@@ -1,4 +1,3 @@
-from .disinfection_3D import *
+from .disinfection3d import *
 from .robot_cspaces import *
-from .getToursAndPaths import *
-from .tspSolverWrapper import *
+from .tsp_solver_wrapper import *

@@ -1,39 +1,50 @@
 # Optimized-UV-Disinfection
 
-/*
+Copyright 2021 University of Illinois Board of Trustees. All Rights Reserved.
 
-* Copyright 2021 University of Illinois Board of Trustees. All Rights Reserved.
+Licensed under the “Non-exclusive Research Use License” (the "License");
 
-* Licensed under the “Non-exclusive Research Use License” (the "License");
+The License is included in the distribution as [LICENSE.txt](https://github.com/joaomcm/Optimized-UV-Disinfection/blob/main/LICENSE.txt) file.
 
-* The License is included in the distribution as LICENSE.txt file.
-
-* See the License for the specific language governing permissions and imitations under the License.
-
-*/
-
-This is the public repository for the code of the paper "Optimized Coverage Planning for UV Surface Disinfection", ICRA 2021
+See the License for the specific language governing permissions and imitations under the License.
 
 
-# Getting this repository up and running:
+# About
 
-You will want to install the python libraries contained in requirements.txt (pip install -r requirements.txt)
+This is the public repository for the code of the paper "Optimized Coverage Planning for UV Surface Disinfection", ICRA 2021.
 
-This specific implentation depends on two pieces of software under separate liceses: Gurobi and LKH-3.0.6
+Authors: Joao Correia Marques, Ramya Ramalingam, Zherong Pan, and Kris Hauser
 
-To get gurobi up and running on your system,you can follow the instructions here (for academic licenses) :       https://www.gurobi.com/academia/academic-program-and-licenses/
+Contact: [Joao Correia Marques](mailto:jmc12@illinois.edu)
 
-To install LKH-3.0.6 you can follow the instructions on the project's website: http://webhotel4.ruc.dk/~keld/research/LKH-3/
+Requires Python 3.x (3.7+ recommended) and an OpenGL 4.1-compatible graphics card for visibility calculations.
 
-## IMPORTANT: After installing LKH make sure to place it on the LKH-3.0.6 folder! 
+# Installing Dependencies
+
+This program depends on two pieces of software distributed under separate liceses: Gurobi and LKH-3.0.6.  To install:
+
+1. Install the Python libraries contained in requirements.txt (pip install -r requirements.txt)
+
+2. To get gurobi up and running on your system,you can follow the instructions here (for academic licenses) :       https://www.gurobi.com/academia/academic-program-and-licenses/
+
+3. To install LKH-3.0.6 you can follow the instructions on the project's website: http://webhotel4.ruc.dk/~keld/research/LKH-3/
+
+4. After installing LKH place it in the `Optimized-UV-Disinfection/LKH-3.0.6` folder
+
 
 # Reproducing our Results
 
-In order to reproduce our results you should be able to just run {robot_model}_experiments.py. In order to visualize the results as a movie, the {Robot Model} Animations jupyter notebooks should create a series of still images that can be used to create a movie using ffmpeg or your program of choice. 
+In order to reproduce the results in the paper,  run `python {robot_model}_experiments.py`.
+
+In order to visualize the results as a movie, the `{Robot Model} Animations.ipynb` Jupyter notebooks will create a series of still images that can be used to create a movie using ffmpeg or your program of choice. 
+
 
 # Using our planner with different robots & environments
 
-To use the planner with a different environment, you should be able to simply change the "mesh_file" argument on either {robot}_experiments.
-Towerbot_experiments.py and floatbot_experiments.py give examples of how to adopt our pipeline to different robots. The first deals with a somewhat similar robot that has no rotational joints and a light that is not a point light-source (thus showing how to adapt to more general light models) and the second deals with a robot that floats in 3D space, though showing what changes need to be made in case of larger differences between tested robots and the default robot - armbot.
+To use the planner with a different environment, you should be able to simply change the "mesh_file" argument to any of the `{robot}_experiments.py` file.
 
-For further inquiries, do not hesitate to contact us. We are happy to help.
+`Towerbot_experiments.py` and `floatbot_experiments.py` give examples of how to adopt our pipeline to different robots. The first is a mobile base robot that has no rotational joints and a light that is not a point light-source, thus showing how to adapt to more general light models.  
+
+`floatbot` is a robot that floats in 3D space, as though it were a quadrobot carrying a light source. This example shows what changes need to be made in case of larger differences between tested robots and the default robot - armbot.
+
+For further inquiries, please contact us. 

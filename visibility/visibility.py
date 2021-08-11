@@ -1,6 +1,6 @@
-import math,glfw,os,trimesh as tm,numpy as np
-from visibility.shaderProgram import ShaderProgram,report_GL_error
-from visibility.shaderMesh import ShaderMesh
+import math,glfw,os,numpy as np
+from .shader_program import ShaderProgram,report_GL_error
+from .shader_mesh import ShaderMesh
 from OpenGL import GL
 from PIL import Image
 
@@ -319,8 +319,8 @@ class Visibility:
             if hasattr(self,'robotOccluder'):
                 delattr(self,'robotOccluder')
         else: 
-            import robotOccluder
-            self.robotOccluder=robotOccluder.Occluder(robot,bulbId)
+            from . import robot_occluder
+            self.robotOccluder=robot_occluder.Occluder(robot,bulbId)
       
     '''      
         main API for calculating visibility
@@ -574,6 +574,6 @@ class Visibility:
         plt.show()
             
 if __name__=='__main__':
-    Visibility.debug_render_shader("data/sphere.obj", 128, [24,0,0], robot='primitives/ur5e.rob', bulbId=8)
-    Visibility.debug_render_framerate('data/room100k.obj', 1024, [0,10000], nrLightSample=1)
-    Visibility.debug_render_framerate('data/room100k.obj', 1024, [0,10000], nrLightSample=4)
+    Visibility.debug_render_shader("../data/visibility_tests/sphere.obj", 128, [24,0,0], robot='../data/ur5e.rob', bulbId=8)
+    Visibility.debug_render_framerate('../data/visibility_tests/data/room100k.obj', 1024, [0,10000], nrLightSample=1)
+    Visibility.debug_render_framerate('../data/visibility_tests/data/room100k.obj', 1024, [0,10000], nrLightSample=4)

@@ -1,0 +1,52 @@
+### Boilerplate kinematics of Towerbot
+TParent 1 0 0   0 1 0   0 0 1   0 0 0  \
+1 0 0   0 1 0   0 0 1   0 0 0  \
+1 0 0   0 1 0   0 0 1   0 0 0  \
+1 0 0   0 1 0   0 0 1   0 0 0.36
+parents -1 0 1 2
+axis 1 0 0   0 1 0  0 0 1   0 0 1 
+jointtype p p p p
+qMin -100 -100 -100 -100
+qMax  100  100  100  100
+q 0 0 0 0
+links "tx" "ty" "tz" "bulb"
+geometry   ""  "" "primitives/scaled_cylinder.off" "primitives/uv_light.off"
+geomscale 1 1 1 1
+mass       0.1 0.1 0.1 0.1
+com 0 0 0   0 0 0   0 0 0   0 0 0
+inertia 0.001 0 0 0 0.001 0 0 0 0.001 \
+    0.001 0 0 0 0.001 0 0 0 0.001 \
+    0.001 0 0 0 0.001 0 0 0 0.001 \
+    0.001 0 0 0 0.001 0 0 0 0.001
+torqueMax  500 500 500 500
+accMax     4 4 4 4
+velMax     2 2 2 4
+
+joint normal 0
+joint normal 1
+joint normal 2
+joint weld 3
+
+driver normal 0 
+driver normal 1
+driver normal 2
+
+servoP 5000 5000 5000 
+servoI 10 10 10 
+servoD 100 100 100 
+viscousFriction 50 50 50 
+dryFriction 1 1 1
+
+
+noselfcollision 0 1
+noselfcollision 1 2
+noselfcollision 0 2
+noselfcollision 2 3
+
+
+property sensors <sensors><ForceTorqueSensor name="base_force" link="2" hasForce="1 1 1" hasTorque="1 1 1" /></sensors>
+
+
+
+
+
