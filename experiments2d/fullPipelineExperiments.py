@@ -2,12 +2,12 @@ import sys
 
 sys.path.append("../")
 
-from experiments_2D.scene_creator import Scene_Creator
+from experiments2d.scene_creator import Scene_Creator
 import numpy as np
 import pickle
 import time
 import pandas as pd
-from experiments_2D.gridLP import get_grid_points, get_vs_graphs, solve_lp, get_grid_points_res,get_internal_grid_points_res
+from experiments2d.gridLP import get_grid_points, get_vs_graphs, solve_lp, get_grid_points_res,get_internal_grid_points_res
 from shapely.geometry import Polygon, LineString, LinearRing, MultiPolygon,Point,MultiPoint 
 from importlib import reload
 from shapely.geometry.collection import GeometryCollection
@@ -22,7 +22,8 @@ from gridLP import get_grid_points, get_vs_graphs, solve_lp, get_grid_points_res
 from matplotlib import pyplot as plt
 from prm_calculator import CSpaceObstacleSolver1,CircleObstacleCSpace,MultiPgon
 from optimizePathMILP import getGridLines, getGridEdges, getActualEdges, getAdjacencyMatrixFromEdges
-from planning.getToursAndPaths import getTour, readTourFile, getPathFromPrm, getFinalPath
+from experiments2d.getToursAndPaths import  getFinalPath
+from planning.tsp_solver_wrapper import readTourFile, runTSP
 import os
 import pdb
 from tqdm import tqdm 
@@ -76,7 +77,7 @@ def solveScene(fileName, results_dir = '../Media/Complete_Pipeline_2D',res = 0.5
 
 
     # ## getting visibility graphs:
-
+    print('computing visibility graphs')
     vsGraphList = get_vs_graphs(gridPointList,scene2.get_vertex_coordinates(),scene2.get_edges(),use_shapely = True,obstacles = scene2.scene)
     # ## we then solve the LP
 
@@ -141,8 +142,8 @@ def solveScene(fileName, results_dir = '../Media/Complete_Pipeline_2D',res = 0.5
 
     print(program.G)
     # # With the distance matrix, we run a TSP solver to find a good tour through the dwell points
-    getTour(adjacency_matrix, '/currTSP') # We just have an arbitrary name since it doesn't matter - can change this so that user can input filename if desired
-    tour = readTourFile(os.path.abspath('../currTSP.txt'), milestones)
+    runTSP(adjacency_matrix, '/currTSP','empty comment') # We just have an arbitrary name since it doesn't matter - can change this so that user can input filename if desired
+    tour = readTourFile(os.path.abspath('../currTSP.txt'))
     # Now, we can convert this tour (described by the indices of the milestones) into a tour 
     # described by Euclidean co-ordinates (the original co-ordinates, from chosenPoints)
     euclideanTour = [milestones[tour[i]] for i in range(len(tour))]
@@ -204,7 +205,7 @@ resolutions = []
 vantage = []
 env_resolutions = []
 
-for res in tqdm([1/(2**j) for j in range(5,8)]):
+for res in tqdm([1/(2**j) for j in range(2,3)]):
     for i in range(0,25):
         env_res = 1
         fileName = '../data/2D_data/rooms/room_'+str(i)+'/scene_'+str(i)+'.p'

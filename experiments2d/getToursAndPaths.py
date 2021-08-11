@@ -1,7 +1,11 @@
 import math
 import numpy as np
 import time 
-import .plotSolutions as myplot
+import os
+import sys
+
+sys.path.append(os.path.abspath("../"))
+import experiments2d.plotSolutions as myplot
 from dijkstar import Graph, find_path
 from shapely.geometry import Point, LineString, Polygon, MultiPolygon
 from klampt.plan import cspace,robotplanning

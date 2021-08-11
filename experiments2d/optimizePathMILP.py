@@ -1,8 +1,8 @@
 # from dijkstar import Graph, find_path
 import sys
-
-sys.path.append("../")
-
+import os
+sys.path.append(os.path.abspath("../"))
+print(sys.path)
 
 import gurobipy as gp
 from gurobipy import GRB
@@ -13,15 +13,15 @@ import numpy as np
 import pickle
 import scipy.sparse as sp
 from gridLP import get_grid_points_res
-from experiments_2D.prm_calculator import CSpaceObstacleSolver1,CircleObstacleCSpace,MultiPgon
+from experiments2d.prm_calculator import CSpaceObstacleSolver1,CircleObstacleCSpace,MultiPgon
 from shapely.geometry import Point, LineString, MultiLineString, Polygon, MultiPolygon
 import time
 from tqdm import tqdm
-from experiments_2D.scene_creator import Scene_Creator
-from planning.getToursAndPaths import getFinalPath
-from experiments_2D.gridLP import compute_flux_pseudo_3d, examplePolygonList, exampleObstacleNodes, exampleEdges, get_grid_points_res, get_vs_graphs, get_irradiation_matrix, get_scene_details
-import experiments_2D.plotSolutions as myplot
-import experiments_2D.visibilityGraph as vs
+from experiments2d.scene_creator import Scene_Creator
+from experiments2d.getToursAndPaths import getFinalPath
+from experiments2d.gridLP import compute_flux_pseudo_3d, examplePolygonList, exampleObstacleNodes, exampleEdges, get_grid_points_res, get_vs_graphs, get_irradiation_matrix, get_scene_details
+import experiments2d.plotSolutions as myplot
+import experiments2d.visibilityGraph as vs
 import pdb
 import pandas as pd
 
@@ -295,7 +295,7 @@ def solveTotalTimeMILP(polygonList, validGrid, velocity, minFluxReqd, pseudo_3D=
     milestones = []
     for l in validGrid:
         milestones.append(l)
-    program = CSpaceObstacleSolver1(space,milestones = milestones, initial_points= 1000)
+    program = CSpaceObstacleSolver1(space,milestones = milestones, initial_points= 100)
     adjacencyMatrix, pathDict = program.get_adjacency_matrix_from_milestones()
     new_adjacency = np.zeros(shape = (adjacencyMatrix.shape[0]+1,adjacencyMatrix.shape[1]+1))
     new_adjacency[:-1,:-1] = adjacencyMatrix
@@ -305,115 +305,133 @@ def solveTotalTimeMILP(polygonList, validGrid, velocity, minFluxReqd, pseudo_3D=
     print('getting irradiation matrix')
     irradiationMatrix = get_irradiation_matrix(edgeList,obstacleNodeList,validGrid,obstacles,height=2,power=80,pseudo_3D=pseudo_3D)
 
-    try:
-        # Create a new model
-        m = gp.Model("MinimizeTotalTime")
-        m.setParam("NodefileStart", 0.5)
-        m.setParam("TimeLimit", 60*60)
-        m.params.MIPGap = 0.01
-        m.params.Threads = 19
-        m.params.Presolve = 2
-        m.params.PreSparsify = 1
-        m.params.Cuts = 0
-        m.params.MIPFocus = 3
-        m.params.ImproveStartTime = 720
-        # m.params.Method = 3
-        # m.params.NodeMethod = 1
-        # print('no problems so far')
+    # try:
 
-        # m.params.Method = 3
-        print("numPoints = {} , adjacency_shape = {}".format(numPoints,adjacencyMatrix.shape))
-        # Creating variables
-            # timeVarDict variables are named from 'C0' to 'CN', where N=numPoints-1
-        timeVarDict = m.addMVar(numPoints, vtype=GRB.CONTINUOUS, name = 'timeVars')
-            # edgeVarDict variables are named from 'CN1' to CN2' where N1=numPoints and N2=numPoints+(numPoints+1)^2 - 1
-        edgeVarDict = m.addMVar((numPoints+1,numPoints+1), vtype=GRB.BINARY,name = 'edgeVars')
-            # networkFlowDict variables are named from 'CN3' to 'CN4', where N3 = numPoints + (numPoints+1)^2 and N4 = numPoints + 2*(numPoints+1)^2 - 1
-        networkFlowDict = m.addMVar((numPoints+1,numPoints+1), vtype=GRB.CONTINUOUS, name  = 'networkVars')
+    # Create a new model
+    m = gp.Model("MinimizeTotalTime")
+    m.setParam("NodefileStart", 0.5)
+    m.setParam("TimeLimit", 60*60)
+    m.params.MIPGap = 0.01
+    m.params.Threads = 19
+    m.params.Presolve = 2
+    m.params.PreSparsify = 1
+    m.params.Cuts = 0
+    m.params.MIPFocus = 3
+    m.params.ImproveStartTime = 720
+    # m.params.Method = 3
+    # m.params.NodeMethod = 1
+    # print('no problems so far')
 
-        slackVars = m.addMVar(irradiationMatrix.shape[0], vtype=GRB.CONTINUOUS, name  = 'slackVars')
-        # Setting objective
-        numPointOnes = np.ones(numPoints)
-        obj = gp.MLinExpr()
-        obj = numPointOnes @ timeVarDict
-        # print('gets here')
-            # Assuming the last node (index - numPoints) is a "dummy" node, whose distance from all other nodes is zero
-            # The path length in the objective includes only "real" edges, not involving the dummy node. Therefore, this optimization finds the shortest path, not tour
-        for i in range(numPoints):
-            obj += velocityAdjacencyMatrix[:,i] @ edgeVarDict[:,i]
-        obj += 100*slackVars.sum()
-        print('multiplies \n\n')
-        m.setObjective(obj, GRB.MINIMIZE)
-        # Setting constraints
-            # Setting bounds for each time variable
-        numPointZeros = np.zeros(numPoints)
-        TIME_UPPER_LIM = 3000000
-        m.addConstr(timeVarDict >= numPointZeros, "Time_sign_constraints")
-        numPointM = np.full(numPoints+1, TIME_UPPER_LIM)
-        # print('gets here2 ')
-        for i in range(numPoints):
-            m.addConstr(timeVarDict[i] <= edgeVarDict[i,:] @ numPointM, "Time_upper-bound_constraint"+str(i))
-            # Setting bounds for each network flow variable
-        numPointPlusZeros = np.zeros(numPoints+1)
-        for i in range(numPoints+1):
-            m.addConstr(networkFlowDict[i,:] >= numPointPlusZeros, "Flow_sign_constraint" + str(i))
-            ubVector = np.full(1,TIME_UPPER_LIM)
-            m.addConstr(networkFlowDict[i,:] <= edgeVarDict[i,:] * TIME_UPPER_LIM, "Flow_upper-bound_constraint" + str(i))
-            # No edges allowed from a vertex to itself
-        for i in range(numPoints+1):
-            m.addConstr(edgeVarDict[i,i] == 0, "No_loop_edges_constraint" + str(i))
-            # No flow allowed from a vertex to itself
-        for i in range(numPoints+1):
-            m.addConstr(networkFlowDict[i,i] == 0, "No_loop_flows_constraint" + str(i))
-            # Making sure tour starts at the dummy node (which has index numPoints)
-        numPointPlusOnes = np.ones(numPoints+1)
-        m.addConstr(numPointPlusOnes @ edgeVarDict[numPoints,:] == 1, "Start_at_dummy_node")
-            # Adding constraints for required flux value for each edge
-        minFluxVector = np.full(numEdges,minFluxReqd)
-                # Multiply by -1 since the original irradiation matrix stores all negative values
-        sparseIrradiationMatrix = sp.csr_matrix(-1 * irradiationMatrix)
-        # print('gets here 3')
-        m.addConstr(sparseIrradiationMatrix @ timeVarDict + slackVars>= minFluxVector, "Edge_flux_constraints")
-        # ensure all slacks are greater of equal to zero
-        m.addConstr(slackVars >= 0, 'slack_constraints')
-            # Ensuring each selected vertex has degree 2
-        # print('gets here 4')
-        for i in range(numPoints+1):
-            m.addConstr(numPointPlusOnes @ edgeVarDict[i,:] == numPointPlusOnes @ edgeVarDict[:,i], "Ensure_degree_2_constraint" + str(i))
-            m.addConstr(numPointPlusOnes @ edgeVarDict[i,:] <= 1, "In-flux_limit_constraint" + str(i))
-        # print('almost there')
-            # Bounding flow values
-        flowBound = m.addVar(vtype = GRB.CONTINUOUS)
-        m.addConstr(flowBound == edgeVarDict.vararr.sum() - 1)
-        maximum = m.addVar(vtype=GRB.CONTINUOUS)
-        m.addConstr(maximum == gp.max_(networkFlowDict.vararr.flatten().tolist()))
-        m.addConstr(maximum -flowBound <= 0)
-            # Ensuring equal-density flow across the tour
-        for i in range(numPoints):
-            m.addConstr(numPointPlusOnes @ networkFlowDict[:,i] - numPointPlusOnes @ networkFlowDict[i,:] ==
-                     numPointPlusOnes @ edgeVarDict[i,:], "Equal_density-flow_constraint" + str(i))
-        # Optimizing model
-        # m.write('..\Week9\model_matrix.lp')
-        # print('Going to optimize')
-        m.optimize()
+    # m.params.Method = 3
+    print("numPoints = {} , adjacency_shape = {}".format(numPoints,adjacencyMatrix.shape))
+    # Creating variables
+        # timeVarDict variables are named from 'C0' to 'CN', where N=numPoints-1
+    timeVarDict = m.addMVar(numPoints, vtype=GRB.CONTINUOUS, name = 'timeVars')
+        # edgeVarDict variables are named from 'CN1' to CN2' where N1=numPoints and N2=numPoints+(numPoints+1)^2 - 1
+    edgeVarDict = m.addMVar((numPoints+1,numPoints+1), vtype=GRB.BINARY,name = 'edgeVars')
+        # networkFlowDict variables are named from 'CN3' to 'CN4', where N3 = numPoints + (numPoints+1)^2 and N4 = numPoints + 2*(numPoints+1)^2 - 1
+    networkFlowDict = m.addMVar((numPoints+1,numPoints+1), vtype=GRB.CONTINUOUS, name  = 'networkVars')
 
-        variableValues = list()
-        # Getting solution
-        # for v in m.getVars():
-        #     print('%s %g' % (v.varName, v.x))
-        #     variableValues.append(v.x)
-        timeValues = timeVarDict.x.flatten()
-        edgeValues = edgeVarDict.x.flatten()
-        print('\n\n\n slack values = {} \n\n\n'.format(slackVars.x.sum()))
-        # pdb.set_trace()
-        # timeValues = m.getVarByName('timeVars').x
-        # edgeValues = m.getVarByName('edgeVars').x
-        print('Obj: %g' % m.objVal)
-        return timeValues, edgeValues, irradiationMatrix,pathDict, m.objVal,adjacencyMatrix
-    except gp.GurobiError as e:
-        print('Error code ' + str(e.errno) + ': ' + str(e))
-    except AttributeError:
-        print('Encountered an attribute error')
+    slackVars = m.addMVar(irradiationMatrix.shape[0], vtype=GRB.CONTINUOUS, name  = 'slackVars')
+    # Setting objective
+    numPointOnes = np.ones(numPoints)
+    obj = gp.MLinExpr()
+    obj = numPointOnes @ timeVarDict
+    # print('gets here')
+        # Assuming the last node (index - numPoints) is a "dummy" node, whose distance from all other nodes is zero
+        # The path length in the objective includes only "real" edges, not involving the dummy node. Therefore, this optimization finds the shortest path, not tour
+    for i in range(numPoints):
+        obj += velocityAdjacencyMatrix[:,i] @ edgeVarDict[:,i]
+    obj += 100*slackVars.sum()
+    print('multiplies \n\n')
+    m.setObjective(obj, GRB.MINIMIZE)
+    # Setting constraints
+        # Setting bounds for each time variable
+    numPointZeros = np.zeros(numPoints)
+    TIME_UPPER_LIM = 3000000
+    m.addConstr(timeVarDict >= numPointZeros, "Time_sign_constraints")
+    numPointM = np.full(numPoints+1, TIME_UPPER_LIM)
+    # print('gets here2 ')
+    for i in range(numPoints):
+        m.addConstr(timeVarDict[i] <= edgeVarDict[i,:] @ numPointM, "Time_upper-bound_constraint"+str(i))
+        # Setting bounds for each network flow variable
+    numPointPlusZeros = np.zeros(numPoints+1)
+    print('after multiplication 1')
+    for i in range(numPoints+1):
+        m.addConstr(networkFlowDict[i,:] >= numPointPlusZeros, "Flow_sign_constraint" + str(i))
+        ubVector = np.full(1,TIME_UPPER_LIM)
+        m.addConstr(networkFlowDict[i,:] <= edgeVarDict[i,:] * TIME_UPPER_LIM, "Flow_upper-bound_constraint" + str(i))
+        # No edges allowed from a vertex to itself
+    for i in range(numPoints+1):
+        m.addConstr(edgeVarDict[i,i] == 0, "No_loop_edges_constraint" + str(i))
+        # No flow allowed from a vertex to itself
+    for i in range(numPoints+1):
+        m.addConstr(networkFlowDict[i,i] == 0, "No_loop_flows_constraint" + str(i))
+        # Making sure tour starts at the dummy node (which has index numPoints)
+    print('gets here?')
+    numPointPlusOnes = np.ones(numPoints+1)
+    m.addConstr(numPointPlusOnes @ edgeVarDict[numPoints,:] == 1, "Start_at_dummy_node")
+        # Adding constraints for required flux value for each edge
+    minFluxVector = np.full(numEdges,minFluxReqd)
+            # Multiply by -1 since the original irradiation matrix stores all negative values
+    sparseIrradiationMatrix = sp.csr_matrix(-1 * irradiationMatrix)
+    # print('gets here 3')
+    m.addConstr(sparseIrradiationMatrix @ timeVarDict + slackVars>= minFluxVector, "Edge_flux_constraints")
+    # ensure all slacks are greater of equal to zero
+    m.addConstr(slackVars >= 0, 'slack_constraints')
+        # Ensuring each selected vertex has degree 2
+    print('gets here 4')
+    for i in range(numPoints+1):
+        m.addConstr(numPointPlusOnes @ edgeVarDict[i,:] == numPointPlusOnes @ edgeVarDict[:,i], "Ensure_degree_2_constraint" + str(i))
+        m.addConstr(numPointPlusOnes @ edgeVarDict[i,:] <= 1, "In-flux_limit_constraint" + str(i))
+        # Bounding flow values
+    tmp_matrix_sum = gp.LinExpr()
+    for this_one in edgeVarDict.tolist():
+        tmp_matrix_sum += sum(this_one)
+    flowBound = m.addVar(vtype = GRB.CONTINUOUS)
+    print('almost there')
+    # print(edgeVarDict.vararr.sum())
+
+    m.addConstr(flowBound == tmp_matrix_sum - 1)
+
+    maximum = m.addVar(vtype=GRB.CONTINUOUS)
+    networkFlowFlatList = []
+    for i in networkFlowDict.tolist():
+        networkFlowFlatList.extend(i)
+    m.addConstr(maximum == gp.max_(networkFlowFlatList))
+    m.addConstr(maximum -flowBound <= 0)
+        # Ensuring equal-density flow across the tour
+    print('passes through here')
+    for i in range(numPoints):
+        m.addConstr(numPointPlusOnes @ networkFlowDict[:,i] - numPointPlusOnes @ networkFlowDict[i,:] ==
+                    numPointPlusOnes @ edgeVarDict[i,:], "Equal_density-flow_constraint" + str(i))
+    # Optimizing model
+    # m.write('..\Week9\model_matrix.lp')
+    # print('Going to optimize')
+    m.optimize()
+    print('finished optimizing')
+    variableValues = list()
+    # Getting solution
+    # for v in m.getVars():
+    #     print('%s %g' % (v.varName, v.x))
+    #     variableValues.append(v.x)
+    timeValues = timeVarDict.x.flatten()
+    edgeValues = edgeVarDict.x.flatten()
+    print('\n\n\n slack values = {} \n\n\n'.format(slackVars.x.sum()))
+    # pdb.set_trace()
+    # timeValues = m.getVarByName('timeVars').x
+    # edgeValues = m.getVarByName('edgeVars').x
+    print('Obj: %g' % m.objVal)
+    return timeValues, edgeValues, irradiationMatrix,pathDict, m.objVal,adjacencyMatrix
+    # except gp.GurobiError as e:
+    #     print('Error code ' + str(e.errno) + ': ' + str(e))
+    # except AttributeError:
+    #     print('Encountered an attribute error', AttributeError)
+    # except Exception as e:
+    #     print(' This is the exception! {}'.format(e))
+
+
+
 
 def extractTour(edgeValues, chosenPoints):
     '''
@@ -466,7 +484,7 @@ def main():
     runtimes = []
     resolutions = []
     vantage = []
-    for roomnum in range(0,25):
+    for roomnum in range(0,3):
         fileName = '../data/2D_data/rooms/room_'+str(roomnum)+'/scene_'+str(roomnum)+'.p'
         with open(fileName, 'rb') as f:
             scene = pickle.load(f)
@@ -512,7 +530,7 @@ def main():
                 vantagePointTimes.append((gridPointList[i], currVal))
                 totalTime += currVal
         # euclideanTour = [gridPointList[tour[i]] for i in range(1, len(tour) - 1)]
-        print('No. of edges irradiated is: ', objValue)
+        # print('No. of edges irradiated is: ', objValue)
         print('Dwell-time of solution is: ', totalTime)
         # print('Disinfection time of solution is: ', objValue)
         print('Path-length of solution is: ', pathLength)

@@ -7,8 +7,8 @@ import time
 from scipy import optimize
 import scipy.sparse as sp
 from shapely.geometry import Point, LineString, Polygon, MultiPolygon
-import experiments_2D.visibilityGraph as vs
-import experiments_2D.plotSolutions as myplot
+import experiments2d.visibilityGraph as vs
+import experiments2d.plotSolutions as myplot
 from joblib import Parallel, delayed
 from tqdm import tqdm
 
@@ -130,7 +130,7 @@ def get_vs_graphs(startNodeList, edgeNodeList, edgeList,use_shapely = False,obst
     #     vsGraphList.append(currGraph)
 
     # parallel_version
-    vsGraphList = Parallel(n_jobs = -2,verbose = 2)(delayed(vs.generate_visibility_graph_no_rotation)(node,edgeNodeList,edgeList,use_shapely = use_shapely,obstacles = obstacles) for node in startNodeList)
+    vsGraphList = Parallel(n_jobs = -2,verbose = 2, prefer = 'threads')(delayed(vs.generate_visibility_graph_no_rotation)(node,edgeNodeList,edgeList,use_shapely = use_shapely,obstacles = obstacles) for node in startNodeList)
     return vsGraphList
 
 def get_irradiation_matrix(edgeList, nodeList, chosenPoints, obstacles, height=2, power=1, pseudo_3D = False,vsGraphList = []):

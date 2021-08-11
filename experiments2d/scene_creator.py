@@ -18,20 +18,20 @@ import pickle
 import os
 from matplotlib import patches 
 from matplotlib import pyplot as plt
-from experiments_2D.figures import BLUE, SIZE, set_limits, plot_coords, color_isvalid
+from experiments2d.figures import BLUE, SIZE, set_limits, plot_coords, color_isvalid
 from shapely.geometry import MultiPoint,Point
 from shapely.ops import split
 from tqdm import tqdm
 
 # from importlib import reload
 # import experiments_2D.gridLP
-import experiments_2D.visibilityGraph as vs
+import experiments2d.visibilityGraph as vs
 # reload(gridLP)
-from experiments_2D.gridLP import get_grid_points, get_vs_graphs, solve_lp, get_grid_points_res
+from experiments2d.gridLP import get_grid_points, get_vs_graphs, solve_lp, get_grid_points_res
 
-import experiments_2D.plotSolutions as plotSolutions
+import experiments2d.plotSolutions as plotSolutions
 # reload(plotSolutions)
-import experiments_2D.plotSolutions as myplot
+import experiments2d.plotSolutions as myplot
 
 from OpenGL.GL import *
 from OpenGL.GLU import *
