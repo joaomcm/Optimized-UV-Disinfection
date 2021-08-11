@@ -18,7 +18,7 @@ import numpy as np
 import time
 
 #root directory for Optimized-UV-Disinfection
-lkh_dir = os.path.join(*os.path.abspath(os.path.join(os.path.split(__file__)[0],'..')))
+lkh_dir = os.path.join(os.path.abspath(os.path.join(os.path.split(__file__)[0],'..')))
 tsplib_dir = lkh_dir
 lkh_cmd = '/LKH-3.0.6/LKH'
 
@@ -46,7 +46,7 @@ def writeTSPLIBfile_FE(fname_tsp,CostMatrix,user_comment):
 		cost_matrix_strline = cost_matrix_strline + str(int(CostMatrix[i][j]))
 		cost_matrix_strline = cost_matrix_strline + '\n'
 		Cost_Matrix_STRline.append(cost_matrix_strline)
-	
+	# print('\\n\n\n\n\n\n\n\n\n\n tsplib_dir = {} \n\n\n\n\n'.format(tsplib_dir))
 	fileID = open((tsplib_dir + fname_tsp + '.tsp'), "w+")
 	# print(name_line)
 	fileID.write(name_line)
@@ -118,9 +118,13 @@ def readTourFile(filename):
 
     return integerTour
 
-def runTSP(CostMatrix, fname_tsp, user_comment):
+def runTSP(CostMatrix, fname_tsp, user_comment = ' '):
+	print('\n\n\n\n\n {}    \n\n\n'.format(fname_tsp))
 	[fileID1,fileID2] = writeTSPLIBfile_FE(fname_tsp,CostMatrix,user_comment)
 	run_LKHsolver_cmd(fname_tsp)
+
+	final_path = lkh_dir + '/' + fname_tsp
 	#copy_toTSPLIBdir_cmd(fname_tsp)
 	#rm_solution_file_cmd(fname_tsp)
-	return readTourFile(name_tsp+'.txt')
+	# print('\n\n\n\n final_path = {} , lkh_dir = {}\n\n '.format(final_path,lkh_dir)	)
+	return readTourFile(final_path+'.txt')

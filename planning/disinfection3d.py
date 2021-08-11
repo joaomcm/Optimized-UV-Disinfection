@@ -21,7 +21,7 @@ import gurobipy as gp
 from tqdm import tqdm
 from copy import deepcopy
 import pathlib
-
+import open3d as o3d
 from klampt import IKObjective
 from klampt import WorldModel,Geometry3D
 from klampt import vis
