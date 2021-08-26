@@ -300,6 +300,9 @@ class Robot3DCSpace(CSpace):
             else:
                 return self.sample_nearby(nearest_connected,spatial_neighborhood = 0.4,angle_neighborhood = np.pi/6)
 
+class UnreachablePointsError(Exception):
+    def __init__(self, message):
+        self.message = message
 
 class CSpaceObstacleSolver:
         def __init__(self,space,milestones = (0,0),initial_points = 4000,steps = 100):
@@ -316,7 +319,7 @@ class CSpaceObstacleSolver:
             for milestone in self.milestones:
                 self.planner.addMilestone(milestone.tolist())
             self.components = int(self.planner.getStats()['numComponents'])
-            print(self.components)
+            # print(self.components)
             print('planning initial roadmap with {} points'.format(initial_points))
 
             self.planner.planMore(self.initial_points)
@@ -381,6 +384,8 @@ class CSpaceObstacleSolver:
                 milestone_1 = 0
                 remaining = self.total_milestones - self.connected_list
                 G_list = self.planner.getRoadmap()
+                if(len(G_list[0]) > 2500):
+                    raise UnreachablePointsError('There are points in the planner that are not feasible after 2500 samples!')
                 G = nx.Graph()
                 self.space.set_remaining_milestones(remaining,G_list)
                 G.add_nodes_from(range(len(G_list[0])))

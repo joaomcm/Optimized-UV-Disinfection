@@ -18,6 +18,8 @@ import numpy as np
 import time
 import networkx as nx
 import gurobipy as gp
+import shapely
+import trimesh as tm
 from tqdm import tqdm
 from copy import deepcopy
 import pathlib
@@ -34,7 +36,7 @@ from klampt.plan.cspace import CSpace,MotionPlan
 from klampt.model.trajectory import RobotTrajectory,Trajectory
 from klampt.math.vectorops import interpolate
 from klampt.plan.cspace import CSpace,MotionPlan
-
+from alphashape import alphashape
 
 from visibility import Visibility
 from tqdm import tqdm
@@ -76,22 +78,28 @@ class DisinfectionProblem:
         self.robot_cspace_solver_generator = robot_cspace_solver
         self.float_height = float_height
         self.initial_points = initial_points
+
         pass
     
     def get_sampling_places(self,mesh_file,resolution = 5000,robot_height = 1.5,convex_scale = 0.9):
-        mesh = Geometry3D()
-        if not mesh.loadFile(mesh_file):
-            raise ValueError("Invalid mesh file {}".format(mesh_file))
 
-        bmin, bmax = mesh.getBBTight()
-        
-        # resolution = (np.max(bounds)-np.min(bounds))/divs
         resolution = resolution/1000
-        x_ = np.arange(bmin[0] - resolution,bmax[0]+resolution,resolution)
-        y_ = np.arange(bmin[1] - resolution,bmax[1]+resolution,resolution)
+        mesh = self.get_maximum_connected_component_mesh(mesh_file)
+        projection = mesh.vertices[mesh.vertices[:,2]<0.3,:2]
+        alpha_shape = alphashape(projection,10)
+        # if the alpha_shape is a multipoligon, we get its component with largest area
+        if(type(alpha_shape) == shapely.geometry.multipolygon.MultiPolygon):
+            max_area = 0
+            for shape in alpha_shape:
+                if(shape.area>max_area):
+                    max_area = shape.area
+                    final_shape = shape
+            alpha_shape = final_shape
+        bounds = alpha_shape.bounds
+        x_ = np.arange(bounds[0] - resolution,bounds[2]+resolution,resolution)
+        y_ = np.arange(bounds[1] - resolution,bounds[3]+resolution,resolution)
         z_ = np.arange(0,robot_height+resolution,resolution)
-
-        x,y,z = np.meshgrid(x_, y_, z_, indexing='ij')
+        x,y,z = np.meshgrid(x_,y_,z_,indexing = 'ij')
         x = x.flatten()
         y = y.flatten()
         z = z.flatten()
@@ -99,30 +107,25 @@ class DisinfectionProblem:
         sampling_places[:,0] = x
         sampling_places[:,1] = y
         sampling_places[:,2] = z
+        multipoint = shapely.geometry.MultiPoint(sampling_places[:,:2])
+        result = []
+        for point in list(multipoint):
+            result.append(alpha_shape.contains(point))
+        sampling_places = sampling_places[result]
+        print("\n\n\n\n this is the shape of sampling places  = {} \n\n\n\n\n".format(sampling_places.shape))
 
-        # we then get the convex hull of the mesh and shrink it to at least sample points that are closer to being "inside"
-        mesh = Geometry3D()
-        if not mesh.loadFile(mesh_file):
-            raise ValueError("Invalid mesh file {}".format(mesh_file))
-        min_bounds,max_bounds = mesh.getBBTight()
-        min_bounds = np.asarray(min_bounds)
-        max_bounds = np.asarray(max_bounds)
-        mean = (max_bounds-min_bounds)/2
-
-        original_max_bounds = deepcopy(max_bounds)
-        max_bounds = convex_scale*(max_bounds - mean)+mean
-        min_bounds = convex_scale*(min_bounds - mean)+mean
-
-        min_x = min_bounds[0]
-        max_x = max_bounds[0]
-        min_y = min_bounds[1]
-        max_y = max_bounds[1]
-
-        sampling_places = sampling_places[np.logical_and(sampling_places[:,0]>min_x,sampling_places[:,0]<max_x)]
-        sampling_places = sampling_places[np.logical_and(sampling_places[:,1]>min_y,sampling_places[:,1]<max_y)]
-
-        return sampling_places,resolution,original_max_bounds
+        return sampling_places,resolution,bounds[2:],alpha_shape
     
+    def get_maximum_connected_component_mesh(self,mesh_file):
+        full_mesh = tm.exchange.load.load(mesh_file)
+        conn_components = tm.graph.split(full_mesh, only_watertight = False)
+        max_faces = 0
+        for component in conn_components:
+            if(component.faces.shape[0]>max_faces):
+                max_faces = component.faces.shape[0]
+                maximum_connected_component  = component
+        return maximum_connected_component
+        
     def get_irradiance_matrix(self,vis_tester,mesh,sampling_places):
         total_faces = mesh.mesh.faces.shape[0]
         irradiance_matrix = lil_matrix((sampling_places.shape[0],total_faces))
@@ -168,13 +171,25 @@ class DisinfectionProblem:
         return world,robot,lamp,collider
 
 
-    def collisionChecker(self,collider):
-        if(list(collider.collisions())!= []):
+    def collisionChecker(self,collider,robot):
+        base_radius = 0.225
+        base_center = shapely.geometry.Point(robot.getConfig()[:2])
+        within_boundary = self.alpha_shape.contains(base_center)
+        # print(within_boundary)
+        if(within_boundary == False):
+            # print('\n\n\n out of bounds')
+            # point is not interior to the alpha shape of the floorplan
+            return False
+        elif(self.alpha_shape.exterior.distance(base_center) < base_radius):
+            # point is interior to the alphashape, but base is partially outside of it.
+            return False
+        elif(list(collider.collisions())!= []):
             # print('\n\n\n New Collision \n\n')
             # for i in collider.collisions():
             #     print(i[0].getName(),i[1].getName())
             # print(list(collider.collisions()))
             return False
+
 
         return True
     
@@ -195,7 +210,7 @@ class DisinfectionProblem:
         solver.setActiveDofs(self.active_dofs)
         for i in range(restarts):
             if(solver.solve()):
-                if(self.collisionChecker(collider)):
+                if(self.collisionChecker(collider,robot)):
                     return True
                 else:
                     solver.sampleInitial()
@@ -223,10 +238,8 @@ class DisinfectionProblem:
             reachable.append(self.solve_ik_near_sample(robot,lamp,collider,world,place,restarts = 10,tol = 1e-2,neighborhood = neighborhood,float_height = float_height))
             # print('reachable? = {}'.format(reachable[-1]))
             cfig = robot.getConfig()
-        #         print(cfig[2])
             configs.append(cfig+place.tolist())
-        
-        # after checking for those margins, we reset the robot to its original configs for general motion planning
+        #         print(cfig[2])soft_semantic_thresholdinge reset the robot to its original configs for general motion planning
         self.set_robot_link_collision_margins(robot,0,collider,self.angular_dofs)
         # we also reset the base and environment collision to simplify path planning:
         world.terrain(0).geometry().setCollisionMargin(0)
@@ -247,7 +260,7 @@ class DisinfectionProblem:
             linear_dofs = self.linear_dofs,
             angular_dofs = self.angular_dofs,
             light_local_position  = self.local_lamp_coords)
-        program = self.robot_cspace_solver_generator(space,milestones = milestones, initial_points= self.initial_points,steps = 200)
+        program = self.robot_cspace_solver_generator(space,milestones = milestones, initial_points= self.initial_points,steps = 100)
         adjacency_matrix,roadmap,node_coords = program.get_adjacency_matrix_from_milestones()
         program.planner.space.close()
         program.planner.close()
@@ -257,7 +270,7 @@ class DisinfectionProblem:
         if(len(visible_area_weights) == 0):
             visible_area_weights = np.zeros(visible_irradiance.shape[1])
             visible_area_weights[:] = 1
-        print(visible_irradiance)
+        # print(visible_irradiance)
         
         m = gp.Model('Irradiance Solver LP')
         # m.params.Method = 3
@@ -280,6 +293,40 @@ class DisinfectionProblem:
         m.optimize()
         return times.x
 
+    def get_visible_triangle_weights(self,m,visible_points):
+        # we consider the probabilities to be encoded in the red channel
+        probs = m.mesh.visual.face_colors[:,0].astype(float)/255
+        # print('\n\n\n this is probs {} \n\n\n'.format(probs))
+        # we calculate the areas:
+        areas = m.area()
+        visible_areas = areas[visible_points]
+        area_fractions = np.exp(100*(visible_areas/visible_areas.sum()))
+        # we then filter only the visible probabilities
+        probs = probs[visible_points]
+        # print('\n\n\n this is probs {} \n\n\n'.format(probs))
+        # if there are any probabilities encoded:
+        if(np.unique(probs).shape[0] > 1):
+            # if we are using hard probabilistic cutoffs for the area
+            if(self.hard_cutoff):
+                # print('\n\n\n\n\n\n APPLYING HARD CUTOFF \n\n\n\n\n')
+                probs = probs > self.cutoff_threshold
+                # print(probs.astype(int)*area_fractions)
+                return probs.astype(int)*area_fractions
+            else:
+                if(self.cutoff_threshold != 0):
+                    # print('\n\n\n\n\n SOFT THRESHOLDING \n\n\n\n')
+                    return np.exp(probs)*area_fractions
+                else:
+                    # cutoff_threshold = 0 indicates surface-agnostic treatment
+                    # print('\n\n\nSURFACE AGNOSTIC!!!\n\n\n')
+                    return area_fractions
+        else:
+            # if no probabilities are encoded, all triangles are equal and weighted by their areas
+            # print('\n\n\nSURFACE AGNOSTIC TYPE II - NO INFO AVAILABLE!!!\n\n\n')
+            return area_fractions
+        # print('\n\n\n\n')
+
+
     def perform_experiment(self,results_dir = './3D_results',mesh_file = './remeshed_hospital_room_full_70k.obj',from_scratch = True,irradiance_from_scratch = True,
         min_distance = 0.05,
         float_height = 0.08,
@@ -289,7 +336,12 @@ class DisinfectionProblem:
         min_fluence = 280,
         power  = 80, 
         experiment = '30_mins',
-        robot_name = 'armbot'):
+        robot_name = 'armbot',
+        hard_cutoff = False,
+        cutoff_threshold = 0.5):
+
+        self.hard_cutoff = hard_cutoff
+        self.cutoff_threshold = cutoff_threshold
         
         
         mesh_path =  pathlib.PurePath(mesh_file)
@@ -319,9 +371,9 @@ class DisinfectionProblem:
         node_coords_file = results_dir + '/{}_node_coords_{}_divs.p'.format(robot_name,resolution)
 
 
-        sampling_places,grid_resolution,original_max_bounds = self.get_sampling_places(mesh_file, resolution = resolution,convex_scale = convex_scale)
+        sampling_places,grid_resolution,original_max_bounds,alpha_shape = self.get_sampling_places(mesh_file, resolution = resolution,convex_scale = convex_scale)
 
-
+        self.alpha_shape = alpha_shape
 
  
 
@@ -402,9 +454,8 @@ class DisinfectionProblem:
         # we then define the visible area weights:
 
 
-
-        visible_area_weights = np.exp(100*(visible_areas/visible_areas.sum()))
-        visible_area_weights[:] = 1
+        visible_area_weights = self.get_visible_triangle_weights(m,visible_points)
+        # visible_area_weights = np.exp(100*(visible_areas/visible_areas.sum()))
 
         # building the LP:
 

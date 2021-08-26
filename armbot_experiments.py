@@ -25,7 +25,7 @@ coverages = []
 resolutions = []
 
 #resolution here is in mm
-for res in tqdm([750]):#,20,30,40,50,60,70,80]):
+for res in tqdm([1000]):#,20,30,40,50,60,70,80]):
     total_distance,coverage,resolution,res_dir = problem.perform_experiment(
     results_dir = './3D_results',
     mesh_file = './data/environment_meshes/remeshed_hospital_room_full_35k.obj',

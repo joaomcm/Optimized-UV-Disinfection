@@ -240,11 +240,11 @@ total_distances = []
 coverages = []
 resolutions = []
 
-tmp = '/data/environment_meshes/remeshed_hospital_room_full_35k.obj'
+tmp = '/home/motion/Optimized-UV-Disinfection/data/environment_meshes/Single Scene Example - ScanNet0000_00/estimate_native_5_cm.ply'
 for res in tqdm([750]):#,20,30,40,50,60,70,80]):
     total_distance,coverage,resolution,res_dir = problem.perform_experiment(
     results_dir = './3D_results',
-    mesh_file = './data/environment_meshes/remeshed_hospital_room_full_35k.obj',
+    mesh_file = tmp,
     min_distance = 0.05,
     from_scratch = True,
     irradiance_from_scratch = True,

@@ -15,3 +15,5 @@ PyOpenGL~=3.1.5
 scikit_learn~=0.24.2
 rtree~=0.9.7
 open3d
+alphashape
+shapely
